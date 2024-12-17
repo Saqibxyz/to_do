@@ -4,6 +4,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEdit, FiTrash2, FiSave } from "react-icons/fi";
 import { FaPlus, FaSpinner } from "react-icons/fa";
+import Navbar from "@/components/Navbar";
 
 const TaskManager = () => {
     const [tasks, setTasks] = useState([]);
@@ -12,8 +13,8 @@ const TaskManager = () => {
     const [editTask, setEditTask] = useState(null);
     const [energyLevel, setEnergyLevel] = useState("");
     const [optimizedTasks, setOptimizedTasks] = useState([]);
-    const [isOptimizing, setIsOptimizing] = useState(false); // Loading state for AI
-    const [showOptimizedTasks, setShowOptimizedTasks] = useState(false); // Show/hide AI tasks
+    const [isOptimizing, setIsOptimizing] = useState(false);
+    const [showOptimizedTasks, setShowOptimizedTasks] = useState(false);
 
     // Fetch tasks
     useEffect(() => {
@@ -100,7 +101,7 @@ const TaskManager = () => {
                     messages: [
                         {
                             role: "system",
-                            content: "Optimize tasks based on energy levels.",
+                            content: "Optimize tasks based on energy levels and time.Be to the point and give response as ordered list response without markup.",
                         },
                         {
                             role: "user",
@@ -129,129 +130,136 @@ const TaskManager = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl shadow-lg">
-            <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
-                Task Manager 🚀
-            </h1>
+        <div className="flex flex-col min-h-screen">
 
-            {/* Add Task Section */}
-            <div className="flex gap-2 mb-4">
-                <input
-                    type="text"
-                    value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                    placeholder="Add a new task..."
-                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400"
-                />
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={handleAddTask}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
-                >
-                    <FaPlus /> Add
-                </motion.button>
-            </div>
+            <Navbar />
 
-            {/* Task List */}
-            {loading ? (
-                <p>Loading tasks...</p>
-            ) : (
-                <ul className="space-y-3">
-                    <AnimatePresence>
-                        {tasks.map((task) => (
-                            <motion.li
-                                key={task.id}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                className="bg-white p-3 rounded-md shadow-md flex justify-between"
-                            >
-                                {editTask?.id === task.id ? (
-                                    <>
-                                        <input
-                                            value={editTask.title}
-                                            onChange={(e) =>
-                                                setEditTask({ ...editTask, title: e.target.value })
-                                            }
-                                            className="w-full border rounded px-2 py-1"
-                                        />
-                                        <FiSave
-                                            onClick={handleEditTask}
-                                            className="text-green-500 cursor-pointer"
-                                        />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>{task.title}</span>
-                                        <div className="flex gap-2">
-                                            <FiEdit
-                                                onClick={() => setEditTask(task)}
-                                                className="text-yellow-500 cursor-pointer"
-                                            />
-                                            <FiTrash2
-                                                onClick={() => handleDeleteTask(task.id)}
-                                                className="text-red-500 cursor-pointer"
-                                            />
-                                        </div>
-                                    </>
-                                )}
-                            </motion.li>
-                        ))}
-                    </AnimatePresence>
-                </ul>
-            )}
 
-            {/* Optimize Tasks */}
-            <div className="mt-8">
-                <h2 className="text-lg font-semibold mb-2">Optimize Tasks</h2>
-                <div className="flex gap-2">
+            <div
+                className="flex-grow min-w-[30rem] mx-auto p-6 mb-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl shadow-lg mt-8"
+            >
+
+
+
+
+                <div className="flex gap-2 mb-4">
                     <input
                         type="text"
-                        value={energyLevel}
-                        onChange={(e) => setEnergyLevel(e.target.value)}
-                        placeholder="Energy Level (Low, Medium, High)"
-                        className="w-full px-3 py-2 border rounded-md"
+                        value={newTaskTitle}
+                        onChange={(e) => setNewTaskTitle(e.target.value)}
+                        placeholder="Add a new task..."
+                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400"
                     />
                     <motion.button
                         whileHover={{ scale: 1.05 }}
-                        onClick={handleOptimizeTasks}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-md flex items-center"
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleAddTask}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md"
                     >
-                        {isOptimizing ? (
-                            <FaSpinner className="animate-spin mr-2" />
-                        ) : (
-                            "Optimize"
-                        )}
+                        <FaPlus /> Add
                     </motion.button>
                 </div>
 
-                {/* Optimized Tasks */}
-                <AnimatePresence>
-                    {showOptimizedTasks && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="mt-4"
+                {/* Task List */}
+                {loading ? (
+                    <p>Loading tasks...</p>
+                ) : (
+                    <ul className="space-y-3">
+                        <AnimatePresence>
+                            {tasks.map((task) => (
+                                <motion.li
+                                    key={task.id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    className="bg-white p-3 rounded-md shadow-md flex justify-between"
+                                >
+                                    {editTask?.id === task.id ? (
+                                        <>
+                                            <input
+                                                value={editTask.title}
+                                                onChange={(e) =>
+                                                    setEditTask({ ...editTask, title: e.target.value })
+                                                }
+                                                className="w-full border rounded px-2 py-1"
+                                            />
+                                            <FiSave
+                                                onClick={handleEditTask}
+                                                className="text-green-500 cursor-pointer"
+                                            />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>{task.title}</span>
+                                            <div className="flex gap-2">
+                                                <FiEdit
+                                                    onClick={() => setEditTask(task)}
+                                                    className="text-yellow-500 cursor-pointer"
+                                                />
+                                                <FiTrash2
+                                                    onClick={() => handleDeleteTask(task.id)}
+                                                    className="text-red-500 cursor-pointer"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                </motion.li>
+                            ))}
+                        </AnimatePresence>
+                    </ul>
+                )}
+
+                {/* Optimize Tasks */}
+                <div className="mt-8">
+                    <h2 className="text-lg font-semibold mb-2">Optimize Tasks</h2>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={energyLevel}
+                            onChange={(e) => setEnergyLevel(e.target.value)}
+                            placeholder="Energy Level (Low, Medium, High) and time (morning etc.)"
+                            className="w-full px-3 py-2 border rounded-md text-xs"
+                        />
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            onClick={handleOptimizeTasks}
+                            className="bg-purple-600 text-white px-4 py-2 rounded-md flex items-center"
                         >
-                            <h3 className="font-semibold mb-2">Optimized Tasks</h3>
-                            <ul>
-                                {optimizedTasks.map((task, idx) => (
-                                    <li key={idx} className="bg-gray-100 rounded p-2 mb-1">
-                                        {task}
-                                    </li>
-                                ))}
-                            </ul>
-                            <button
-                                onClick={() => setShowOptimizedTasks(false)}
-                                className="mt-2 bg-red-500 text-white px-3 py-1 rounded-md"
+                            {isOptimizing ? (
+                                <FaSpinner className="animate-spin mr-2" />
+                            ) : (
+                                "Optimize"
+                            )}
+                        </motion.button>
+                    </div>
+
+                    {/* Optimized Tasks */}
+                    <AnimatePresence>
+                        {showOptimizedTasks && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="mt-4"
                             >
-                                Done
-                            </button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                <h3 className="font-semibold mb-2">Optimized Tasks</h3>
+                                <ul>
+                                    {optimizedTasks.map((task, idx) => (
+                                        <li key={idx} className="bg-gray-100 rounded p-2 mb-1">
+                                            {task}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <button
+                                    onClick={() => setShowOptimizedTasks(false)}
+                                    className="mt-2 bg-red-500 text-white px-3 py-1 rounded-md"
+                                >
+                                    Done
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </div>
         </div>
     );
