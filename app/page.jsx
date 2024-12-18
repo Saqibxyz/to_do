@@ -15,6 +15,7 @@ const TaskManager = () => {
     const [optimizedTasks, setOptimizedTasks] = useState([]);
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [showOptimizedTasks, setShowOptimizedTasks] = useState(false);
+    const [rateLimitReached, setRateLimitReached] = useState(false);
 
     // Fetch tasks
     useEffect(() => {
@@ -97,7 +98,7 @@ const TaskManager = () => {
             const response = await axios.post(
                 "https://api.openai.com/v1/chat/completions",
                 {
-                    model: "gpt-3.5-turbo",
+                    model: "gpt-4o-mini",
                     messages: [
                         {
                             role: "system",
@@ -124,6 +125,9 @@ const TaskManager = () => {
             setShowOptimizedTasks(true);
         } catch (e) {
             console.error("Error optimizing tasks:", e);
+            if (e.response?.status === 429) {
+                setRateLimitReached(true);
+            }
         } finally {
             setIsOptimizing(false);
         }
@@ -134,14 +138,9 @@ const TaskManager = () => {
 
             <Navbar />
 
-
             <div
                 className="flex-grow min-w-[30rem] mx-auto p-6 mb-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl shadow-lg mt-8"
             >
-
-
-
-
                 <div className="flex gap-2 mb-4">
                     <input
                         type="text"
@@ -261,6 +260,21 @@ const TaskManager = () => {
                     </AnimatePresence>
                 </div>
             </div>
+
+            {/* Rate Limit Popup */}
+            {rateLimitReached && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded shadow-md text-center">
+                        <p className="mb-4 text-red-500 font-semibold">Oops, OpenAI rate limit reached!</p>
+                        <button
+                            onClick={() => setRateLimitReached(false)}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
